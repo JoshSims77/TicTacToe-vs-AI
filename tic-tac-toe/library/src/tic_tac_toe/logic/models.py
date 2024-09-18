@@ -55,7 +55,7 @@ class Move:
     before_state: GameState     #state before move
     after_state: GameState      #state after
 
-@dataclass(frozen=True)
+@dataclass(frozen=True) #ability to recognize all possible gamestates (match hasnt started , ongoing match , tie , winner )
 class GameState:
     grid: Grid
     starting_mark: Mark = Mark("X")
