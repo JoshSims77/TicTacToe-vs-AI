@@ -6,7 +6,8 @@ import re
 from dataclasses import dataclass
 from functools import cached_property
 
-from tic_tac_toe.logic.validators import validate_grid
+from tic_tac_toe.logic.exceptions import InvalidMove
+from tic_tac_toe.logic.validators import validate_game_state, validate_grid
 
 WINNING_PATTERNS = (
     "???......",
@@ -58,10 +59,13 @@ class Move:
     before_state: GameState     #state before move
     after_state: GameState      #state after
 
-@dataclass(frozen=True) #ability to recognize all possible gamestates (match hasnt started , ongoing match , tie , winner )
+@dataclass(frozen=True) #ability to recognize all possible gamestates (match hasnt started , ongoing match , tie , winner ) as well as validate them with validate_game_state()
 class GameState:
     grid: Grid
     starting_mark: Mark = Mark("X")
+
+    def __post_init__(self) -> None:
+        validate_game_state(self)
 
     @cached_property
     def current_mark(self) -> Mark:
@@ -101,3 +105,27 @@ class GameState:
                     ]
         return []
             
+    @cached_property
+    def possible_moves(self) -> list[Move]:
+        moves = []
+        if not self.game_over:
+            for match in re.finditer(r"\s", self.grid.cells):
+                moves.append(self.make_move_to(match.start()))
+        return moves
+
+    def make_move_to(self, index: int) -> Move:
+        if self.grid.cells[index] != " ":
+            raise InvalidMove("Cell is not empty")
+        return Move(
+            mark=self.current_mark,
+            cell_index=index,
+            before_state=self,
+            after_state=GameState(
+                Grid(
+                    self.grid.cells[:index]
+                    + self.current_mark
+                    + self.grid.cells[index + 1:]
+                ),
+                self.starting_mark,
+            ),
+        )
