@@ -4,14 +4,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING: #Solves circular import
+if TYPE_CHECKING: #Solves circular imports
+    from tic_tac_toe.game.players import Player
     from tic_tac_toe.logic.models import GameState, Grid, Mark
 
 import re
 
 from tic_tac_toe.logic.exceptions import InvalidGameState
-
-from tic_tac_toe.logic.models import Grid
 
 
 #Error handling if something other than an x, 0 or " " slips its way into the grid
@@ -60,3 +59,7 @@ def validate_winner(
         else: 
             if grid.o_count != grid.x_count:
                 raise InvalidGameState("Wrong number of 0s")
+            
+def validate_players(player1: Player, player2: Player) -> None:
+    if player1.mark is player2.mark:
+        raise ValueError("Players must use different marks")

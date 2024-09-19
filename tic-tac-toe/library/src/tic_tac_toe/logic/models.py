@@ -69,7 +69,7 @@ class GameState:
 
     @cached_property
     def current_mark(self) -> Mark:
-        if self.grid.x_count == self.grid.o.count:
+        if self.grid.x_count == self.grid.o_count:
             return self.starting_mark
         else:
             return self.starting_mark.other
