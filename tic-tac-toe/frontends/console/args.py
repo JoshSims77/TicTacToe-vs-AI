@@ -1,44 +1,45 @@
-# tic-tac-toe\frontends\console\args.py
-
+# frontends/console/args.py
 
 import argparse
 from typing import NamedTuple
 
-from tic_tac_toe.game.players import Player, RandomComputerPlayer
+from tic_tac_toe.game.players import (
+    Player, 
+    RandomComputerPlayer,
+    MinimaxComputerPlayer,
+)
+
 from tic_tac_toe.logic.models import Mark
 
-from .players import ConsolePlayer
+from frontends.console.players import ConsolePlayer
+
+
+
+PLAYER_CLASSES = {
+    "human": ConsolePlayer,
+    "random": RandomComputerPlayer,
+    "minimax": MinimaxComputerPlayer,
+}
 
 class Args(NamedTuple):
     player1: Player
     player2: Player
     starting_mark: Mark
 
-PLAYER_CLASSES= {
-    "human": ConsolePlayer,
-    "random": RandomComputerPlayer,
-
-}
-
-
-
 def parse_args() -> Args:
-    parser= argparse.ArgumentParser()
-
+    parser = argparse.ArgumentParser()
     parser.add_argument(
         "-X",
         dest="player_x",
         choices=PLAYER_CLASSES.keys(),
-        default="human",
-    )
-
-    parser.add_argument(
-        "-0",
-        dest="player-o",
-        choices=PLAYER_CLASSES.keys(),
         default="random",
     )
-
+    parser.add_argument(
+        "-O",
+        dest="player_o",
+        choices=PLAYER_CLASSES.keys(),
+        default="minimax",
+    )
     parser.add_argument(
         "--starting",
         dest="starting_mark",
@@ -46,13 +47,12 @@ def parse_args() -> Args:
         type=Mark,
         default="X",
     )
-
     args = parser.parse_args()
 
-    player1=PLAYER_CLASSES[args.player_x](Mark("X"))
-    player2=PLAYER_CLASSES[args.player_o](Mark("0"))
-    
-    if args.starting_mark == "0":
+    player1 = PLAYER_CLASSES[args.player_x](Mark("X"))
+    player2 = PLAYER_CLASSES[args.player_o](Mark("O"))
+
+    if args.starting_mark == "O":
         player1, player2 = player2, player1
 
     return Args(player1, player2, args.starting_mark)
